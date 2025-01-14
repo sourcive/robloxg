@@ -1,0 +1,493 @@
+local a = getgenv()
+if a.b then a.b:Unload() end
+local c = {d = true, e = 14.2, f = 16.5, g = 0}
+local h = game
+local i = h:GetService("ReplicatedStorage")
+local j = h:GetService("UserInputService")
+local k = h:GetService("RunService")
+local l = h:GetService("Workspace")
+local m = h:GetService("Lighting")
+local n = h:GetService("Players")
+local o = h:GetService("Debris")
+local p = i:WaitForChild("CharStats")
+local q = i:WaitForChild("Events")
+local r = l.CurrentCamera
+local s = n.LocalPlayer
+local t = s:GetMouse()
+local u = l:FindFirstChild("Map")
+local v, w, x, y, z, aa, ab = u:FindFirstChild("VendingMachines"), u:FindFirstChild("StreetLights"), u:FindFirstChild("BredMakurz"), u:FindFirstChild("Security"), u:FindFirstChild("Doors"), u:FindFirstChild("Shopz"), u:FindFirstChild("ATMz")
+local ac, ad, ae, af, ag, ah, ai, aj = Instance.new, Vector2.new, Vector3.new, CFrame.new, Color3.fromRGB, require, math.random, math.round
+local ak, al, am, an = table.remove, table.insert, table.clear, table.find
+local ao, ap = task.Spawn, task.wait
+local aq = string.char
+local ar = j:GetMouseLocation()
+local as = RaycastParams.new()
+as.FilterType, as.IgnoreWater, as.RespectCanCollide = Enum.RaycastFilterType.Exclude, true, true
+local at = {au = {}, av = {}, aw = {}, ax = 0, ay = {}, az = {}}
+a.b = at
+local aA = {ae(1, 0, 0), ae(-1, 0, 0), ae(0, 1, 0), ae(0, -1, 0), ae(1, 1, 0), ae(-1, 1, 0), ae(1, -1, 0), ae(-1, -1, 0), ae(0, 0, 1), ae(0, 0, -1)}
+local aB = {Reload = q["GNX_R"], Shoot = q["GNX_S"], RegisterHit = q["ZFKLF_H"]}
+local aC = {Rust = "5043539486", Neverlose = "", Godlike = ""}
+local aD = {LastShot = 0, LastReload = 0, Tracers = {}}
+
+do
+    function at:NewInstance(aE, aF)
+        local aG = ac(aE)
+        for aH, aI in next, aF do aG[aH] = aI end
+        return aG
+    end
+end
+do
+    function at:NewConnection(aJ, aK, aL, aM)
+        local aN = aL:Connect(aM)
+        aK[#aK + 1] = {aJ, aN}
+        return aN
+    end
+    function at:CloseConnection(aO, aP, aQ)
+        for aR, aS in next, aP do
+            if aS[1] == aO then aS[2]:Disconnect() ak(aP, aR) break end
+        end
+    end
+    function at:CloseConnections(aT)
+        for aU = #aT, 1, -1 do aT[aU][2]:Disconnect() ak(aT, aU) end
+    end
+end
+
+do
+    function at:GetCharacterStats(aV)
+        return p[aV] and p[aV] or nil
+    end
+    function at:GetDowned(aW)
+        local aX = at:GetCharacterStats(aW)
+        return aX and aX.Downed.Value or false
+    end
+end
+do
+    function at:Unload()
+        at:CloseConnections(at.au)
+        am(at)
+        a.b = nil
+    end
+    function at:PlaySound(aY)
+        local aZ = at:NewInstance("Sound", {
+            Parent = r,
+            Volume = 0.8,
+            Pitch = 1,
+            SoundId = "rbxassetid://" .. aY,
+            PlayOnRemove = true
+        }):Destroy()
+    end
+    function at:OnLighting()
+        m.Brightness, m.ClockTime, m.FogStart, m.FogEnd, m.GlobalShadows = 2, 0, 1000000, 10000000, false
+        m.Ambient, m.OutdoorAmbient = ah(255, 255, 255), ah(255, 255, 255)
+    end
+end
+do
+    function aD:Predict(a_, b, c)
+        return a_ + (b * (c / 1000))
+    end
+    function aD:Tracer(bA, bB)
+        local bC = at:NewInstance("Attachment", {Position = bA, Parent = l.Terrain})
+        local bD = at:NewInstance("Attachment", {Position = bB, Parent = l.Terrain})
+        local bE = at:NewInstance("Beam", {
+            Texture = "rbxassetid://446111271",
+            LightEmission = 1,
+            LightInfluence = 0,
+            TextureSpeed = 10,
+            Color = ColorSequence.new(ah(255, 0, 0)),
+            Width0 = 1.2,
+            Width1 = 1.2,
+            Attachment0 = bC,
+            Attachment1 = bD,
+            Enabled = true,
+            Parent = l
+        })
+        o:AddItem(bC, 10)
+        o:AddItem(bD, 10)
+        o:AddItem(bE, 10)
+    end
+    function aD:Reload(bF)
+        if (at.ax - aD.LastReload) > 0.05 then
+            aD.LastReload = at.ax
+            aB.Reload:FireServer(at.ax, "KLWE89U0", bF)
+        end
+    end
+    function aD:GetString(bG)
+        local bH = ""
+        for bI = 1, bG do bH = bH .. aq(ai(65, 122)) end
+        return bH
+    end
+end
+
+at:NewConnection("1x01", at.au, k.Stepped, function()
+    at.ax = tick()
+    if not c.d then return end
+    local bJ = s.Character
+    if not bJ then return end
+    local bK = bJ:FindFirstChildOfClass("Humanoid")
+    if not bK then return end
+    local bL = bK.RootPart
+    if not bL then return end
+    local bM = bJ:FindFirstChildOfClass("Tool")
+    if not bM or bM.Name == "Fists" then return end
+    aD:Step(bJ, bK, bL, bM)
+end)
+
+at:NewConnection("2x01", at.au, t.Move, function()
+    ar = j:GetMouseLocation()
+end)
+
+at:NewConnection("2x02", at.au, m.LightingChanged, at.OnLighting)
+
+function aD:Step(bJ, bK, bL, bM)
+    local bN = bL.CFrame.Position
+    local bO, bP = nil, nil
+
+    if true then
+        local bQ = n:GetPlayers()
+        local bR = {}
+        for _, bS in next, bQ do
+            if not am(at.az, bS.Name) then continue end
+            al(bR, bS)
+        end
+        if #bR ~= 0 then
+            bO, bP = aD:GetEntry("Distance", bR, true, 150, 2500, false)
+        else
+            bO, bP = aD:GetEntry("Distance", bQ, true, 150, 2500, false)
+        end
+    else
+        bO, bP = aD:GetEntry("Distance", n:GetPlayers(), true, 150, 2500, false)
+    end
+
+    if bO and bP then
+        local bT = bO["Head"]
+        if bT then
+            local bU = {{Position = bN, Teleport = {}}}
+            bU = aD:Shift(c.e, bN, bU, false, true, false)
+            local bV = {bT.CFrame.Position}
+            bV = aD:Shift(c.f, bT.CFrame.Position, bV, false, false, false)
+            for _, bW in next, bU do
+                for _, bX in next, bV do
+                    if not (bW and bX) then continue end
+                    local bY = bW.Position
+                    local bZ = aD:GetWallbangable(bY, bX - bY, {
+                        bO, r, bJ,
+                        l.Debris, l.Filter, l.Characters,
+                        u.Parts.Grinders, v, w, x, y, z, aa, ab
+                    })
+                    if bZ then
+                        aD:Shoot(bM, bT, bY, bX)
+                    end
+                end
+            end
+        end
+    end
+end
+
+function aD:Shoot(bM, bT, bY, bX)
+    if bM and (bM.Values.SERVER_Ammo.Value > 0) and ((at.ax - aD.LastShot) > c.g) then
+        aD.LastShot = at.ax
+        local cA = {}
+        local cB = aD:GetString(30) .. 0
+        for cC = 1, 1 do
+            al(cA, af(bY, bX).LookVector)
+        end
+        aB.Shoot:FireServer(at.ax, cB, bM, "FDS9I83", bY, cA, false)
+        aD:Reload(bM)
+        for cD, cE in next, cA do
+            aB.RegisterHit:FireServer("\240\159\141\175", bM, cB, cD, bT, bX, cE, nil, nil)
+            aD:Tracer(bY, bX)
+            at:PlaySound(aC["Rust"])
+        end
+        bM.Hitmarker:Fire(bT)
+        bM.Values.Ammo.Value = bM.Values.SERVER_Ammo.Value - 1
+        bM.Values.StoredAmmo.Value = bM.Values.SERVER_StoredAmmo.Value
+    end
+end
+
+function aD:Shift(cF, cG, cH, cI, cJ, cK)
+    for _, cL in next, aA do
+        local cM = cK and l:Raycast(cG, (cL * cF), as) or nil
+        local cN = cM and (cM.Position - cL) or cG + (cL * cF)
+        local cO = {}
+
+        if cI and (cN - cG).Magnitude > 0 then
+            cO = {cN}
+        end
+
+        cH[#cH + 1] = cJ and {Position = cN, Teleport = cO} or cN
+    end
+
+    return cH
+end
+
+function aD:GetWallbangable(cP, cQ, cR)
+    as.FilterDescendantsInstances = cR
+
+    local cS = l:Raycast(cP, cQ, as)
+
+    if cS and cS.Instance then
+        local cT = cS.Instance
+        al(cR, cT)
+
+        if cT:FindFirstChild("FilterV") then
+            return aD:GetWallbangable(cP, cQ, cR)
+        end
+
+        if cT.Transparency == 1 then
+            return aD:GetWallbangable(cP, cQ, cR)
+        end
+
+        if not cT.CanCollide then
+            return aD:GetWallbangable(cP, cQ, cR)
+        end
+
+        return false
+    else
+        return true
+    end
+end
+
+function aD:GetEntry(cU, cV, cW, cX, cY, cZ)
+    local dA, dB, dC = nil, nil, math.huge
+
+    for _, dD in next, cV do
+        if dD == s then continue end
+        if cW and am(at.ay, dD.Name) then continue end
+
+        local dE = dD.Character
+        if not dE then continue end
+
+        if dE:FindFirstChildOfClass("ForceField") then continue end
+
+        local dF = dE:FindFirstChildOfClass("Humanoid")
+        if not dF then continue end
+
+        local dG = dF.RootPart
+        if not dG then continue end
+
+        local dH = dF.Health
+        if dH <= 0 then continue end
+
+        if cZ then
+            local dI = at:GetDowned(dD.Name)
+            if dI then continue end
+        end
+
+        local dJ = dG.CFrame.Position
+
+        if cU == "Distance" then
+            local dK = ai((r.CFrame.Position - dJ).Magnitude)
+            if dK <= cY and dK < dC then
+                dC = dK
+                dB = dG
+                dA = dE
+            end
+        elseif cU == "Mouse" then
+            local dL, dM = r:WorldToViewportPoint(dJ)
+            if dM then
+                local dN = ai((ar - ad(dL.X, dL.Y)).Magnitude)
+                if dN <= cX and dN < dC then
+                    dC = dN
+                    dB = dG
+                    dA = dE
+                end
+            end
+        end
+    end
+
+    return dA, dB
+end
+
+function aD:GetEntry(dO, dP, dQ, dR, dS, dT)
+    local dU, dV, dW = nil, nil, math.huge
+
+    for _, dX in next, dP do
+        if dX == s then continue end
+        if dQ and am(at.ay, dX.Name) then continue end
+
+        local dY = dX.Character
+        if not dY then continue end
+
+        if dY:FindFirstChildOfClass("ForceField") then continue end
+
+        local dZ = dY:FindFirstChildOfClass("Humanoid")
+        if not dZ then continue end
+
+        local eA = dZ.RootPart
+        if not eA then continue end
+
+        local eB = dZ.Health
+        if eB <= 0 then continue end
+
+        if dT then
+            local eC = at:GetDowned(dX.Name)
+            if eC then continue end
+        end
+
+        local eD = eA.CFrame.Position
+
+        if dO == "Distance" then
+            local eE = ai((r.CFrame.Position - eD).Magnitude)
+            if eE <= dS and eE < dW then
+                dW = eE
+                dV = eA
+                dU = dY
+            end
+        elseif dO == "Mouse" then
+            local eF, eG = r:WorldToViewportPoint(eD)
+            if eG then
+                local eH = ai((ar - ad(eF.X, eF.Y)).Magnitude)
+                if eH <= dR and eH < dW then
+                    dW = eH
+                    dV = eA
+                    dU = dY
+                end
+            end
+        end
+    end
+
+    return dU, dV
+end
+
+function aD:GetWallbangable(eI, eJ, eK)
+    as.FilterDescendantsInstances = eK
+
+    local eL = l:Raycast(eI, eJ, as)
+
+    if eL and eL.Instance then
+        local eM = eL.Instance
+        al(eK, eM)
+
+        if eM:FindFirstChild("FilterV") then
+            return aD:GetWallbangable(eI, eJ, eK)
+        end
+
+        if eM.Transparency == 1 then
+            return aD:GetWallbangable(eI, eJ, eK)
+        end
+
+        if not eM.CanCollide then
+            return aD:GetWallbangable(eI, eJ, eK)
+        end
+
+        return false
+    else
+        return true
+    end
+end
+
+function aD:Step(eN, eO, eP, eQ)
+    local eR = eP.CFrame.Position
+    local eS, eT = nil, nil
+
+    if true then
+        local eU = n:GetPlayers()
+        local eV = {}
+
+        for _, eW in next, eU do
+            if not am(at.az, eW.Name) then continue end
+            al(eV, eW)
+        end
+
+        if #eV ~= 0 then
+            eS, eT = aD:GetEntry("Distance", eV, true, 150, 2500, false)
+        else
+            eS, eT = aD:GetEntry("Distance", eU, true, 150, 2500, false)
+        end
+    else
+        eS, eT = aD:GetEntry("Distance", n:GetPlayers(), true, 150, 2500, false)
+    end
+
+    if eS and eT then
+        local eX = eS["Head"]
+
+        if eX then
+            local eY = {{Position = eR, Teleport = {}}}
+            eY = aD:Shift(c.e, eR, eY, false, true, false)
+            local eZ = {eX.CFrame.Position}
+            eZ = aD:Shift(c.f, eX.CFrame.Position, eZ, false, false, false)
+
+            for _, fA in next, eY do
+                for _, fB in next, eZ do
+                    if not (fA and fB) then continue end
+                    local fC = fA.Position
+
+                    local fD = aD:GetWallbangable(fC, fB - fC, {
+                        eS, r, eN, l.Debris, l.Filter, l.Characters, u.Parts.Grinders,
+                        v, w, x, y, z, aa, ab
+                    })
+
+                    if fD then
+                        aD:Shoot(eQ, eX, fC, fB)
+                    end
+                end
+            end
+        end
+    end
+end
+
+function aD:Shoot(fE, fF, fG, fH)
+    if fE and (fE.Values.SERVER_Ammo.Value > 0) and ((at.ax - aD.LastShot) > c.g) then
+        aD.LastShot = at.ax
+
+        local fI = {}
+        local fJ = aD:GetString(30) .. 0
+
+        for fK = 1, 1 do
+            al(fI, af(fG, fH).LookVector)
+        end
+
+        aB.Shoot:FireServer(at.ax, fJ, fE, "FDS9I83", fG, fI, false)
+        aD:Reload(fE)
+
+        for fL, fM in next, fI do
+            aB.RegisterHit:FireServer("\240\159\141\175", fE, fJ, fL, fF, fH, fM, nil, nil)
+            aD:Tracer(fG, fH)
+            at:PlaySound(aC["Rust"])
+        end
+
+        fE.Hitmarker:Fire(fF)
+        fE.Values.Ammo.Value = fE.Values.SERVER_Ammo.Value - 1
+        fE.Values.StoredAmmo.Value = fE.Values.SERVER_StoredAmmo.Value
+    end
+end
+
+at:NewConnection("1x01", at.au, k.Stepped, function()
+    at.ax = tick()
+    if not c.d then return end
+
+    local fN = s.Character
+    if not fN then return end
+
+    local fO = fN:FindFirstChildOfClass("Humanoid")
+    if not fO then return end
+
+    local fP = fO.RootPart
+    if not fP then return end
+
+    local fQ = fN:FindFirstChildOfClass("Tool")
+    if not fQ then return end
+
+    if fQ.Name == "Fists" then return end
+
+    aD:Step(fN, fO, fP, fQ)
+end)
+
+at:NewConnection("2x01", at.au, t.Move, function()
+    ar = j:GetMouseLocation()
+end)
+
+at:NewConnection("2x02", at.au, m.LightingChanged, at.OnLighting)
+
+function at:Cleanup()
+    at:CloseConnections(at.au)
+    am(at)
+    a.b = nil
+end
+
+at:NewConnection("CleanupTrigger", at.au, s.AncestryChanged, function(parent)
+    if not parent then
+        at:Cleanup()
+    end
+end)
